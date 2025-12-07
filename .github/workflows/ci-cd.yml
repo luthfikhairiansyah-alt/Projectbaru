@@ -7,7 +7,7 @@ on:
 
 jobs:
 deploy-Luthfi:
-    runs-on: [Project1]
+    runs-on: [lutpi]
 
     steps:
     - name: Checkout repo
@@ -15,7 +15,7 @@ deploy-Luthfi:
 
     - name: Set project path
       run: |
-        PROJECT_PATH=$(find /home -name 'Project1' -type d 2>/dev/null | head -1)
+        PROJECT_PATH=$(find /home -name 'Projectbaru' -type d 2>/dev/null | head -1)
         if [ -z "$PROJECT_PATH" ]; then
           echo "❌ Folder Project1 tidak ditemukan"
           exit 1
@@ -28,7 +28,7 @@ deploy-Luthfi:
         cd ${{ env.PROJECT_PATH }}
         rm -rf .git
         git init
-        git remote add origin https://github.com/luthfikhairiansyah-alt/Project1.git
+        git remote add origin https://github.com/luthfikhairiansyah-alt/Projectbaru.git
         git fetch origin master
         git checkout -f master
 
