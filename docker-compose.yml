@@ -1,0 +1,91 @@
+# Docker Compose untuk PHP Todo App
+# File ini ngatur semua container yang dibutuhkan aplikasi
+version: '3.8'
+
+services:
+  # 🌐 Nginx - Web Server
+  nginx:
+    build:
+      context: .                    # Build dari direktori saat ini
+      dockerfile: Dockerfile.nginx  # Pakai Dockerfile khusus nginx
+    container_name: php-todo-nginx
+    ports:
+      - "8080:80"                   # Port 8080 di host -> port 80 di container
+    depends_on:
+      - php                         # Tunggu PHP container siap dulu
+    volumes:
+      - .:/var/www/html            # Mount project folder ke container
+    networks:
+      - todo-network               # Pakai network khusus buat komunikasi antar container
+
+  # ⚡ PHP-FPM - PHP Processor
+  php:
+    build: .                       # Build dari Dockerfile di direktori ini
+    container_name: php-todo-php
+    environment:
+      # Environment variables buat koneksi database
+      - DB_HOST=mysql              # Hostname database (nama service mysql)
+      - DB_NAME=todo_app           # Nama database
+      - DB_USER=todo_user          # Username database
+      - DB_PASS=todo_password      # Password database
+    depends_on:
+      mysql:
+        condition: service_healthy # Tunggu MySQL benar-benar siap (healthy)
+    volumes:
+      - .:/var/www/html           # Mount project folder (sama kayak nginx)
+      # Volume mounting ini yang bikin development jadi enak!
+    networks:
+      - todo-network
+
+  # 🗃️ MySQL - Database Server
+  mysql:
+    image: mysql:8.0              # Pakai image MySQL official
+    container_name: php-todo-mysql
+    environment:
+      # Setup database dan user
+      - MYSQL_ROOT_PASSWORD=root_password    # Password root
+      - MYSQL_DATABASE=todo_app              # Bikin database otomatis
+      - MYSQL_USER=todo_user                 # Bikin user biasa
+      - MYSQL_PASSWORD=todo_password         # Password user biasa
+    ports:
+      - "3306:3306"               # Expose MySQL port (optional, buat akses dari luar)
+    volumes:
+      - mysql_data:/var/lib/mysql # Persistent storage buat data MySQL
+      - ./database.sql:/docker-entrypoint-initdb.d/init.sql  # Auto import SQL saat pertama kali
+    networks:
+      - todo-network
+    # TIDAK pakai auto restart - biar mahasiswa belajar troubleshoot!
+    healthcheck:
+      # Cek MySQL udah siap terima koneksi atau belum
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
+      interval: 10s               # Cek setiap 10 detik
+      timeout: 5s                 # Timeout 5 detik
+      retries: 5                  # Maksimal retry 5 kali
+      start_period: 30s           # Kasih waktu 30 detik buat startup
+
+  # 🔧 phpMyAdmin - Database Management Tool
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: php-todo-phpmyadmin
+    environment:
+      - PMA_HOST=mysql            # Connect ke MySQL service
+      - PMA_USER=root             # Default user buat login
+      - PMA_PASSWORD=root_password # Default password
+      - MYSQL_ROOT_PASSWORD=root_password
+    ports:
+      - "8081:80"                 # Akses phpMyAdmin di http://localhost:8081
+    depends_on:
+      mysql:
+        condition: service_healthy # Tunggu MySQL siap dulu
+    networks:
+      - todo-network
+
+# 📦 Volumes - Persistent Storage
+volumes:
+  mysql_data:
+    driver: local                 # Simpan data MySQL di local storage
+
+# 🌐 Networks - Komunikasi Antar Container
+networks:
+  todo-network:
+    driver: bridge                # Default network driver
