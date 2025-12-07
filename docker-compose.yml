@@ -10,7 +10,7 @@ services:
       dockerfile: Dockerfile.nginx  # Pakai Dockerfile khusus nginx
     container_name: php-todo-nginx
     ports:
-      - "8080:80"                   # Port 8080 di host -> port 80 di container
+      - "80:80"                     # Port 80 di host -> port 80 di container
     depends_on:
       - php                         # Tunggu PHP container siap dulu
     volumes:
@@ -25,9 +25,9 @@ services:
     environment:
       # Environment variables buat koneksi database
       - DB_HOST=mysql              # Hostname database (nama service mysql)
-      - DB_NAME=todo_app           # Nama database
-      - DB_USER=todo_user          # Username database
-      - DB_PASS=todo_password      # Password database
+      - DB_NAME=library           # Nama database
+      - DB_USER=root          # Username database
+      - DB_PASS=rootpass      # Password database
     depends_on:
       mysql:
         condition: service_healthy # Tunggu MySQL benar-benar siap (healthy)
@@ -43,10 +43,10 @@ services:
     container_name: php-todo-mysql
     environment:
       # Setup database dan user
-      - MYSQL_ROOT_PASSWORD=root_password    # Password root
-      - MYSQL_DATABASE=todo_app              # Bikin database otomatis
-      - MYSQL_USER=todo_user                 # Bikin user biasa
-      - MYSQL_PASSWORD=todo_password         # Password user biasa
+      - MYSQL_ROOT_PASSWORD=rootpass    # Password root
+      - MYSQL_DATABASE=library              # Bikin database otomatis
+      - MYSQL_USER=root                 # Bikin user biasa
+      - MYSQL_PASSWORD=password         # Password user biasa
     ports:
       - "3306:3306"               # Expose MySQL port (optional, buat akses dari luar)
     volumes:
@@ -71,7 +71,7 @@ services:
       - PMA_HOST=mysql            # Connect ke MySQL service
       - PMA_USER=root             # Default user buat login
       - PMA_PASSWORD=root_password # Default password
-      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_ROOT_PASSWORD=rootpass
     ports:
       - "8081:80"                 # Akses phpMyAdmin di http://localhost:8081
     depends_on:

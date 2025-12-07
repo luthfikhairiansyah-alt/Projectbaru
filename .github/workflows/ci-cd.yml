@@ -61,4 +61,4 @@ jobs:
         docker compose ps
 
     - name: Health check
-      run: curl -f http://localhost:80 || exit 1
+      run: curl -f http://localhost:80 || exit 1
