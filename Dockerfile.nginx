@@ -1,48 +1,11 @@
-# Nginx configuration for PHP Todo App
-# This is a simplified version for students to understand
+# Use the official Nginx image as the base
+FROM nginx:alpine
 
-server {
-    # Basic server configuration
-    listen 80;                          # Listen on port 80 (HTTP)
-    server_name localhost;              # Server name
-    root /var/www/html;                 # Document root directory
-    index index.php index.html;        # Default files to serve
+# Copy the custom Nginx configuration file
+COPY default.conf /etc/nginx/conf.d/default.conf
 
-    # Main location - handles all requests
-    location / {
-        # Try to serve file directly, fallback to index.php
-        try_files $uri $uri/ /index.php?$query_string;
-    }
+# Expose port 80
+EXPOSE 80
 
-    # PHP file processing
-    location ~ \.php$ {
-        # Security check - make sure file exists
-        try_files $uri =404;
-        
-        # Send PHP requests to PHP-FPM container
-        fastcgi_pass php:9000;
-        fastcgi_index index.php;
-        
-        # Include basic FastCGI parameters
-        include fastcgi_params;
-        
-        # Tell PHP-FPM where the script file is located
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-    }
-
-    # Static files (CSS, JS, images)
-    location ~* \.(css|js|png|jpg|jpeg|gif|ico)$ {
-        # Cache static files for 30 days
-        expires 30d;
-        add_header Cache-Control "public, max-age=2592000";
-    }
-
-    # Security - Hide sensitive files
-    location ~ /\. {
-        deny all;  # Deny access to hidden files (.env, .git, etc.)
-    }
-
-    # Basic logging
-    access_log /var/log/nginx/access.log;
-    error_log /var/log/nginx/error.log;
-}
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
