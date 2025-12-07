@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-deploy-Luthfi:
+  deploy-Luthfi:
     runs-on: [lutpi]
 
     steps:
@@ -21,7 +21,7 @@ deploy-Luthfi:
           exit 1
         fi
         echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
-    
+
     - name: Fix local repo by fresh clone
       working-directory: ${{ env.PROJECT_PATH }}
       run: |
