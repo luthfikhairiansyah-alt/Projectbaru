@@ -1,14 +1,13 @@
 <?php
-function getConnetion() {
 $servername = getenv('DB_HOST') ?: 'mysql';
-$username   = getenv('DB_USER') ?: 'root';
-$password   = getenv('DB_PASSWORD') ?: '1234';
+$username   = getenv('DB_USER') ?: 'libuser';
+$password   = getenv('DB_PASS') ?: 'libpass';
 $dbname     = getenv('DB_NAME') ?: 'db_library';
 
-$conn = mysqli_connect($servername, $username, $password, $dbname);
-
-if (!$conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+try {
+    $koneksi = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    $koneksi->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
 }
 ?>

@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS db_library
-USE db_library
+CREATE DATABASE IF NOT EXISTS db_library;
+USE db_library;
 
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
@@ -63,7 +63,7 @@ CREATE TABLE `anggota` (
   `no_telp` varchar(15) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
-  `tanggal_daftar` date DEFAULT curdate()
+  `tanggal_daftar` date DEFAULT (CURDATE())
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
