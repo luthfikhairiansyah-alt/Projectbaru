@@ -24,9 +24,9 @@ services:
     environment:
       # Environment variables buat koneksi database
       - DB_HOST=mysql              # Hostname database (nama service mysql)
-      - DB_NAME=library           # Nama database
-      - DB_USER=root          # Username database
-      - DB_PASS=rootpass      # Password database
+      - DB_NAME=db_library           # Nama database
+      - DB_USER=libuser          # Username database
+      - DB_PASS=libpass      # Password database
     depends_on:
       mysql:
         condition: service_healthy # Tunggu MySQL benar-benar siap (healthy)
@@ -40,19 +40,28 @@ services:
   mysql:
     image: mysql:8.0              # Pakai image MySQL official
     container_name: php-todo-mysql
+    restart: unless-stopped       # Auto restart jika crash
     environment:
       # Setup database dan user
       - MYSQL_ROOT_PASSWORD=rootpass    # Password root
-      - MYSQL_DATABASE=library              # Bikin database otomatis
-      - MYSQL_USER=root                 # Bikin user biasa
-      - MYSQL_PASSWORD=password         # Password user biasa
+      - MYSQL_DATABASE=db_library              # Bikin database otomatis
+      - MYSQL_USER=libuser                # Bikin user biasa
+      - MYSQL_PASSWORD=libpass         # Password user biasa
     ports:
       - "3306:3306"               # Expose MySQL port (optional, buat akses dari luar)
     volumes:
       - mysql_data:/var/lib/mysql # Persistent storage buat data MySQL
-      - ./database.sql:/docker-entrypoint-initdb.d/init.sql  # Auto import SQL saat pertama kali
+      - ./library.sql:/docker-entrypoint-initdb.d/init.sql  # Auto import SQL saat pertama kali
     networks:
       - todo-network
+    # TIDAK pakai auto restart - biar mahasiswa belajar troubleshoot!
+    healthcheck:
+      # Cek MySQL udah siap terima koneksi atau belum
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpass"]
+      interval: 10s               # Cek setiap 10 detik
+      timeout: 5s                 # Timeout 5 detik
+      retries: 5                  # Maksimal retry 5 kali
+      start_period: 30s           # Kasih waktu 30 detik buat startup
 
   # 🔧 phpMyAdmin - Database Management Tool
   phpmyadmin:
@@ -61,7 +70,7 @@ services:
     environment:
       - PMA_HOST=mysql            # Connect ke MySQL service
       - PMA_USER=root             # Default user buat login
-      - PMA_PASSWORD=root_password # Default password
+      - PMA_PASSWORD=rootpass # Default password
       - MYSQL_ROOT_PASSWORD=rootpass
     ports:
       - "8081:80"                 # Akses phpMyAdmin di http://localhost:8081
