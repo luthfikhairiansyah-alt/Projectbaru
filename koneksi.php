@@ -2,8 +2,8 @@
 function getConnetion() {
 $servername = getenv('DB_HOST') ?: 'mysql';
 $username   = getenv('DB_USER') ?: 'root';
-$password   = getenv('DB_PASSWORD') ?: '1234';
-$dbname     = getenv('DB_NAME') ?: 'db_library';
+$password   = getenv('DB_PASSWORD') ?: 'rootpass';
+$dbname     = getenv('DB_NAME') ?: 'library';
 
 $conn = mysqli_connect($servername, $username, $password, $dbname);
 

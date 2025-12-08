@@ -1,6 +1,5 @@
 # Docker Compose untuk PHP Todo App
 # File ini ngatur semua container yang dibutuhkan aplikasi
-version: '3.8'
 
 services:
   # 🌐 Nginx - Web Server
@@ -54,14 +53,6 @@ services:
       - ./database.sql:/docker-entrypoint-initdb.d/init.sql  # Auto import SQL saat pertama kali
     networks:
       - todo-network
-    # TIDAK pakai auto restart - biar mahasiswa belajar troubleshoot!
-    healthcheck:
-      # Cek MySQL udah siap terima koneksi atau belum
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
-      interval: 10s               # Cek setiap 10 detik
-      timeout: 5s                 # Timeout 5 detik
-      retries: 5                  # Maksimal retry 5 kali
-      start_period: 30s           # Kasih waktu 30 detik buat startup
 
   # 🔧 phpMyAdmin - Database Management Tool
   phpmyadmin:
